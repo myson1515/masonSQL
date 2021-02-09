@@ -42,7 +42,7 @@ As stated above, the ``` mysql-connector-java-8.0.21.jar ``` must be in the same
 
 #### Second Error:
 
-	![Second Error](assets/error2.png)
+	![Second Error](error2.png)
 
 This means you typed in your password incorrectly.
 It could also mean that ``` root ``` is not your mySQL username. 
