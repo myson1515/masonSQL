@@ -10,19 +10,16 @@
 Run the ``` masonSQL.jar ``` file:
 
 #### Windows:
-
-
-	You should be able to double click the file if Java is installed properly.
-
+You should be able to double click the file if Java is installed properly.
 
 #### macOS & Linux:
 
-	 ``` java -jar masonSQL.jar ```
+ ``` java -jar masonSQL.jar ```
 
-	 **Note**: You have to make sure it is executable.  If it doesn't work try:
+ **Note**: You have to make sure it is executable.  If it doesn't work try:
 
 
-	 ``` chmod +x masonSQL.jar ```
+ ``` chmod +x masonSQL.jar ```
 
 You should then be able to type in your database name and password for mySQL.  This program assumes that ```root``` is the default username for mySQL.
 
@@ -35,11 +32,11 @@ If done Correctly the program should open a new window with a file like structur
 You will most likely recieve 2 kinds of errors if something is done improperly. 
 
 #### First Error:
-	``` 
-	JDBC Driver Not Found!
-	Exiting. 
-	```
-	
+``` 
+JDBC Driver Not Found!
+Exiting. 
+```
+
 This means you don't have the proper driver in the same folder as the masonSQL.jar file.
 As stated above, the ``` mysql-connector-java-8.0.21.jar ``` must be in the same folder as masonSQL.jar file.
 
