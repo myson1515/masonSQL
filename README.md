@@ -9,15 +9,19 @@
 
 Run the ``` masonSQL.jar ``` file:
 
-#### Windows:4
+#### Windows:
+
 
 	You should be able to double click the file if Java is installed properly.
+
 
 #### macOS & Linux:
 
 	 ``` java -jar masonSQL.jar ```
 
 	 **Note**: You have to make sure it is executable.  If it doesn't work try:
+
+
 	 ``` chmod +x masonSQL.jar ```
 
 You should then be able to type in your database name and password for mySQL.  This program assumes that ```root``` is the default username for mySQL.
