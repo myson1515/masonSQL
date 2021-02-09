@@ -25,7 +25,7 @@ You should then be able to type in your database name and password for mySQL.  T
 
 If done Correctly the program should open a new window with a file like structure to view the Database contents.
 
-**Note**: This program has only been tested on linux as of right now (I will remove this once it has been tested on all 3 Operating Systems).
+**Note**: This program has been tested on Windows, macOS and Linux.
 
 ### Common Errors:
 
