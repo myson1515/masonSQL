@@ -79,7 +79,7 @@ public class sqlSignInG {
 					//p.println(conn);
 					//p.println("Connection Successful");
 					JFrame successWindow = new JFrame();
-					JOptionPane.showMessageDialog(successWindow, "Connection to " + name + " database successful!  You may safely close the login window.  Your program will continue to run.", "Success!", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(successWindow, "Connection to " + name + " database successful! \nYou may safely close the login window or keep it open if you want to open another DB.\nYour program will continue to run.", "Success!", JOptionPane.WARNING_MESSAGE);
 					sqlFunc.showTree(DB, conn);	
 					url = "jdbc:mysql://localhost/"; 
 					DB = "";

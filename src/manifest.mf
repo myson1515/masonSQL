@@ -1,0 +1,4 @@
+Manifest-Version: 2.0
+Built-By: Mason L
+Main-Class: sqlSignInG
+Class-Path: mysql-connector-java-8.0.21.jar
