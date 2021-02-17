@@ -27,6 +27,10 @@ If done Correctly the program should open a new window with a file like structur
 
 **Note**: This program has been tested on Windows, macOS and Linux.
 
+### Features:
+
+Press the spacebar when you have selected a table header to show a version of the table in a pretty format.
+
 ### Common Errors:
 
 You will most likely recieve 2 kinds of errors if something is done improperly. 

@@ -23,12 +23,7 @@ public class sqlFunc {
 	public static Map<ArrayList<Object>, Object[]> tableData = new HashMap<ArrayList<Object>, Object[]>();
 	public static Object[] smallColumns;
 	public static Object[] smallRows;
-	private JTree tree;
-	public static void select(String table, Connection conn){
-		String query = "Select Fields from Desc " + table;
-			
-		
-	}
+
 	public static void showTree(String dbName, Connection conn){
 		p.println("Loading Tree...");
 		String query = "select table_name from information_schema.columns where table_schema = \""+ dbName +"\" group by table_name";
@@ -36,9 +31,7 @@ public class sqlFunc {
 		
 		
 		try {
-			//p.print(conn);
 			statement = conn.prepareStatement(query, ResultSet.TYPE_SCROLL_SENSITIVE,  ResultSet.CONCUR_UPDATABLE);
-			//statement = conn.createStatement();
 			ArrayList<String> model = new ArrayList<String>();
 			rs = statement.executeQuery(query);
 			int columnCount = rs.getMetaData().getColumnCount();
@@ -58,7 +51,7 @@ public class sqlFunc {
 			Iterator <Map.Entry<String, DefaultMutableTreeNode>> entrySet = nodeArray.entrySet().iterator();
 			rs.first();
 			connTwo = DriverManager.getConnection(sqlSignInG.getURL(), "root", sqlSignInG.getPass());
-			//ArrayList<String> cols = new ArrayList<String>();
+			
 			
 			while (entrySet.hasNext()){
 				Map.Entry<String, DefaultMutableTreeNode> entry = entrySet.next();
@@ -69,15 +62,14 @@ public class sqlFunc {
 				smallColumns = new Object[ncolumnCount];
 				
 				
-				Map <String, DefaultMutableTreeNode> innerNodeArray = new HashMap<String, DefaultMutableTreeNode>();//Supposed table data
+				Map <String, DefaultMutableTreeNode> innerNodeArray = new HashMap<String, DefaultMutableTreeNode>();
 				
 				while(newRS.next()){
 					String[] nrow = new String[ncolumnCount];
 					for (int i = 1; i <= ncolumnCount; ++i) {
 						smallColumns[i - 1] = newRS.getObject(i);
-					    nrow[i - 1] = newRS.getString(i); // Or even rs.getObject(): HEADER
+					    nrow[i - 1] = newRS.getString(i); 
 						
-					    //innerNodeArray.put(nrow[i - 1], tableItem);
 					    dbItem = new DefaultMutableTreeNode(nrow[i -1]);
 			    		innerNodeArray.put(entry.getKey(), dbItem);
 			    		innerNodeArray.forEach((key, val) -> entry.getValue().add(val));
@@ -102,10 +94,7 @@ public class sqlFunc {
    					    while(lastRS.next()){
     					    for (int x = 1; x <= lastCount; ++x) {
    	    					    Object lastObject = lastRS.getObject(x);
-						    	dbItem.add(new DefaultMutableTreeNode(String.valueOf(lastObject)));
-								
-								//System.out.println(String.valueOf(lastObject));
-								
+						    	dbItem.add(new DefaultMutableTreeNode(String.valueOf(lastObject)));								
 					    	}
 				    	}
 				
@@ -139,15 +128,12 @@ public class sqlFunc {
 			        		            @Override
 			        		            public void keyPressed(KeyEvent e) {
 			        		                if (e.getKeyCode() == 32) {
-			        		                	//JPanel tableWindow = new JPanel();
 			        		                	JFrame tableWindowFrame = new JFrame();
 												tableWindowFrame.setBackground(Color.BLACK);
 												table.addRow(tableData.keySet().toArray());
 
 
 			        		                	JTable thisTable = Jtables.get(nodeInfo.toString());
-												//thisTable.setFillsViewportHeight(true);
-			        		                	//p.println(thisTable);
 			        		                	tableWindowFrame.add(new JScrollPane(thisTable));
 			        		                	tableWindowFrame.setSize(500, 200);
 			        		                	tableWindowFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -189,7 +175,7 @@ public class sqlFunc {
 		}
 		
 	}
-	// Stack Overflow Method
+	// Stack Overflow Method - Credit: https://stackoverflow.com/questions/10620448/most-simple-code-to-populate-jtable-from-resultset
 	public static DefaultTableModel buildTableModel(ResultSet rs)
 			throws SQLException {
 
