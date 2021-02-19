@@ -68,7 +68,7 @@ public class sqlSignInG {
 		frame.setVisible(true);
 		submit.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				pass = tPass.getText();
+				pass = new String(tPass.getPassword());
 				String name = tName.getText();
 				DB = name;
 				url = url + name;
