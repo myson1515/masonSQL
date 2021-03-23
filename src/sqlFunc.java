@@ -3,16 +3,28 @@ import java.sql.*;
 import javax.swing.event.*;                  // Step 1) Load JDBC core library
 import javax.swing.*;
 import javax.swing.tree.*;
+
+
+//import jdk.internal.org.jline.terminal.MouseEvent;
+
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 
 public class sqlFunc {
+	public static boolean runAgain = false;
 	private static ResultSet rs;
 	private static ResultSet newRS; 
 	private static Statement statement;
 	private static Statement newStatement;
-	private static Statement lastStatement;
+	public static DefaultMutableTreeNode node;
+	public static boolean selected = false; 
+	public static boolean selectedInsert = false; 
+	public static JTable thisTable;
+	public static Object nodeInfo;
+	public static JTree tree;
+	public static String passwd = sqlSignInG.getPass();
+	public static String url = sqlSignInG.getURL();
 	private static Map<String, JTable> Jtables = new HashMap<String, JTable>();
 	public static DefaultTableModel table = new DefaultTableModel();
 	public static Connection connTwo;
@@ -25,11 +37,10 @@ public class sqlFunc {
 	public static Object[] smallRows;
 
 	public static void showTree(String dbName, Connection conn){
-		p.println("Loading Tree...");
+		displayHelpInfo();
+		runAgain = false;
 		String query = "select table_name from information_schema.columns where table_schema = \""+ dbName +"\" group by table_name";
 		DefaultMutableTreeNode dbRoot = new DefaultMutableTreeNode(dbName); 
-		
-		
 		try {
 			statement = conn.prepareStatement(query, ResultSet.TYPE_SCROLL_SENSITIVE,  ResultSet.CONCUR_UPDATABLE);
 			ArrayList<String> model = new ArrayList<String>();
@@ -106,55 +117,141 @@ public class sqlFunc {
 
 			}
 			JPanel container = new JPanel();
-			JTree tree = new JTree(dbRoot);
+			tree = new JTree(dbRoot);
 			JFrame frame = new JFrame();
 			final Font currentFont = tree.getFont();
 			final Font bigFont = new Font(currentFont.getName(), currentFont.getStyle(), currentFont.getSize() + 10);
-			tree.addTreeSelectionListener(new TreeSelectionListener() {
-			    public void valueChanged(TreeSelectionEvent e) {
-			        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-			
-			
-			    /* retrieve the node that was selected */ 
-			        Object nodeInfo = node.getUserObject();
-			        for (int y = 0; y <  tree.getModel().getChildCount(tree.getModel().getRoot()); y++)
-			        	if (nodeInfo.toString().equals(tree.getModel().getChild(tree.getModel().getRoot(), y).toString())){
-			        		tree.addKeyListener(new KeyListener() {
-			        		
-			        		            @Override
-			        		            public void keyTyped(KeyEvent e) {
-			        		            }
-			        		
-			        		            @Override
-			        		            public void keyPressed(KeyEvent e) {
-			        		                if (e.getKeyCode() == 32) {
-			        		                	JFrame tableWindowFrame = new JFrame();
-												tableWindowFrame.setBackground(Color.BLACK);
-												table.addRow(tableData.keySet().toArray());
+			tree.addTreeSelectionListener(new TreeSelectionListener(){
 
-
-			        		                	JTable thisTable = Jtables.get(nodeInfo.toString());
-			        		                	tableWindowFrame.add(new JScrollPane(thisTable));
-			        		                	tableWindowFrame.setSize(500, 200);
-			        		                	tableWindowFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			        		                	tableWindowFrame.setTitle("Node Table: " + nodeInfo.toString());
-			        		                	tableWindowFrame.pack();
-			        		                	tableWindowFrame.setVisible(true);
-			        		                    
-			        		                }
-			        		            }
-			        		
-			        		            @Override
-			        		            public void keyReleased(KeyEvent e) {
-			        		            }
-			        		        });
-			        		
-			        		
-			        	}
-			       
-			    }
+				@Override
+				public void valueChanged(TreeSelectionEvent e) {
+					node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+					nodeInfo = node.getUserObject();
+					for (int y = 0; y <  tree.getModel().getChildCount(tree.getModel().getRoot()); y++)
+						if (nodeInfo.toString().equals(tree.getModel().getChild(tree.getModel().getRoot(), y).toString())){
+							selected = true;			
+							selectedInsert = true;
+						}
+					}
 			});
+			tree.addKeyListener(new KeyListener() {
+				@Override
+				public void keyTyped(KeyEvent e) {
 
+				}
+
+				@Override
+				public void keyPressed(KeyEvent e) {
+					// TODO Auto-generated method stub
+					if (e.getKeyCode() == 32) {
+						
+						if (selected == true){
+								Object nodeInfoTwo = node.getUserObject();
+								JFrame tableWindowFrame = new JFrame();
+								tableWindowFrame.setBackground(Color.BLACK);
+								table.addRow(tableData.keySet().toArray());
+		
+								thisTable = Jtables.get(nodeInfo.toString());
+								tableWindowFrame.add(new JScrollPane(thisTable));
+								tableWindowFrame.setSize(500, 200);
+								tableWindowFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+								tableWindowFrame.setTitle("Node Table: " + nodeInfoTwo.toString());
+								tableWindowFrame.pack();
+								tableWindowFrame.setVisible(true);
+								selected = false;
+							}
+						}
+						if(e.getKeyCode() == KeyEvent.VK_I){
+							//System.out.println("n pressed.");
+							if(selectedInsert == true){
+							try {
+								String getColumnsQuery = "SELECT column_name FROM information_schema.columns WHERE table_schema = '" +dbName + "' AND table_name = '" + nodeInfo.toString() + "'";
+								Connection colsConnection = DriverManager.getConnection(url,"root", passwd);
+								Statement colsStat = colsConnection.prepareStatement(getColumnsQuery, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+								ResultSet colRS = colsStat.executeQuery(getColumnsQuery);
+								ArrayList<String> headerList = new ArrayList<String>();
+								int columnCount = colRS.getMetaData().getColumnCount();
+								while(colRS.next()){
+									for(int l = 1; l <= columnCount; l++){
+										headerList.add(colRS.getString(l));
+										//System.out.println(colRS.getString(l));
+									}
+								}
+								JPanel insertPanel = new JPanel();
+								insertPanel.setPreferredSize(new Dimension(600, 600));
+								JFrame insertFrame = new JFrame();
+
+								Map<String, JTextField> insertMap = new HashMap<String, JTextField>();
+
+								for (int i = 0; i < headerList.size(); i++){
+									insertMap.put(headerList.get(i), new JTextField(headerList.get(i), 20));
+
+								}
+								Iterator <Map.Entry<String, JTextField>> textSet = insertMap.entrySet().iterator(); 
+								while(textSet.hasNext()){
+									Map.Entry<String, JTextField> entry = textSet.next();
+
+									insertPanel.add(entry.getValue());
+
+									
+								}
+								JButton insertButton = new JButton("Insert");
+								insertPanel.add(insertButton);
+								insertFrame.setPreferredSize(new Dimension(600, 200));
+								insertFrame.add(insertPanel);
+								
+								insertFrame.pack();
+								insertFrame.setVisible(true);
+								insertFrame.setTitle("INSERT");
+								insertButton.addActionListener(new ActionListener(){
+									@Override
+									public void actionPerformed(ActionEvent e){
+										Iterator <Map.Entry<String, JTextField>> textSetTwo = insertMap.entrySet().iterator(); 
+										ArrayList<String> insertResults = new ArrayList<String>();
+										while(textSetTwo.hasNext()){
+											Map.Entry<String, JTextField> entryTwo = textSetTwo.next();
+											insertResults.add("\"" + entryTwo.getValue().getText()+ "\"");
+											
+										}
+										String insertStringQuery = "INSERT INTO " + nodeInfo.toString() + " VALUES (" + insertResults.toString().replace("[", "").replace("]", "") + ")";
+										System.out.println(insertStringQuery);
+										try {
+																					
+											Statement insGO = colsConnection.createStatement();
+											insGO.executeUpdate(insertStringQuery);
+											JFrame successWindow = new JFrame();
+											JOptionPane.showMessageDialog(successWindow, "Added insert info the the table.\n Please close this window and the tree window and log in again.", "Success!", JOptionPane.PLAIN_MESSAGE);
+											//sqlFunc.runAgain = true;
+										} catch (SQLException e1) {
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
+
+
+									}
+							
+
+								});
+								//insertPanel.pack();
+								
+							} catch (SQLException ex) {
+								// TODO Auto-generated catch block
+								ex.printStackTrace();
+							}
+							selectedInsert = false;
+						}
+					}
+					
+					
+				}
+
+				@Override
+				public void keyReleased(KeyEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+			});
 			tree.setFont(bigFont);
 			container.add(tree);
 			container.setBackground(Color.WHITE);
@@ -171,8 +268,9 @@ public class sqlFunc {
 			JFrame errorWindow = new JFrame();
 			JOptionPane.showMessageDialog(errorWindow, ex.toString(), "Error Message", JOptionPane.WARNING_MESSAGE);
 			
-							
+						
 		}
+		//System.out.println(runAgain);
 		
 	}
 	// Stack Overflow Method - Credit: https://stackoverflow.com/questions/10620448/most-simple-code-to-populate-jtable-from-resultset
@@ -202,11 +300,39 @@ public class sqlFunc {
 
 	}
 
+
 	public static void buildCols(ArrayList<String> aList){
 		
 		
 	}
 	public static void main(String[] args){
 		
+	}
+	public static void deselectAll(JTree tree) {
+        if (tree == null) {
+            throw new NullPointerException("tree == null");
+        }
+        TreeSelectionModel m = tree.getSelectionModel();
+        if (m != null) {
+            m.clearSelection();
+        }
+    }
+	public static void displayHelpInfo(){
+		JFrame frame = new JFrame("Help Information");
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		frame.setSize(200, 200);
+		frame.setLayout(new FlowLayout());
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		JLabel spacelab = new JLabel("Press '[spacebar]' -> Display the selected table data in a grid-like formation.");
+		JLabel Ilab = new JLabel("Press '[i]' -> Insert Data into the selected table.");
+		spacelab.setVerticalAlignment(JLabel.TOP);
+		panel.add(spacelab);
+		panel.add(Ilab);
+		frame.add(panel);
+		frame.pack();
+		frame.setVisible(true);
+
+
 	}
 }
